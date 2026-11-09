@@ -1,0 +1,44 @@
+\section{Validación del modelo programado}
+
+La validación del modelo programado se apoya en tres procedimientos
+complementarios.
+
+\subsection{Contraste con resultados analíticos}
+
+Para las estaciones del sistema que admiten un tratamiento analítico se
+comparó la utilización simulada con la calculada mediante teoría de colas.
+Siendo $\lambda$ la tasa de arribos efectiva a la estación, $E[S]$ el tiempo
+medio de servicio y $c$ el número de servidores:
+
+\[
+\rho = \frac{\lambda\, E[S]}{c}
+\]
+
+Para el puesto de triage, con $\lambda = 9{,}91$ pacientes por hora y
+$E[S] = 5{,}33$ minutos, resulta $\rho = 0{,}88$. Para los consultorios, con
+$E[S] = 20{,}3$ minutos ponderado por la distribución de colores y $c = 4$,
+resulta $\rho = 0{,}84$.
+
+La comparación de estos valores con los de la tabla~\ref{tab:piloto}
+constituye la prueba de validación más exigente aplicada al modelo, por
+cuanto un desvío significativo señala una inconsistencia en los parámetros o
+en la estructura.
+
+\subsection{Validación aparente}
+
+El recorrido de los pacientes sobre el plano fue revisado visualmente durante
+las corridas, verificando que la secuencia de desplazamientos se corresponda
+con el circuito real: que la espera se produzca en la sala y no en los
+consultorios, que los pacientes de ambulancia accedan directamente al Shock
+Room y que los consultorios se ocupen de manera equilibrada.
+
+\subsection{Validación con el sistema real}
+
+\begin{pendiente}
+Esta subsección debe completarse contrastando las salidas del modelo con el
+conocimiento de la profesional del hospital consultada: ¿resultan
+verosímiles los tiempos de espera obtenidos? ¿se corresponde la proporción de
+internaciones con lo observado en la práctica? Se recomienda documentar esa
+conversación como evidencia de validación.
+\end{pendiente}
+

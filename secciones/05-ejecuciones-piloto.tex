@@ -1,0 +1,69 @@
+\section{Ejecuciones piloto}
+\label{sec:piloto}
+
+Se realizaron ejecuciones piloto con la configuración base con el objeto de
+detectar comportamientos anómalos antes de las corridas de producción.
+
+\subsection{Utilización observada}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Recurso} & \textbf{Servidores} & \textbf{$\rho$ analítico} & \textbf{$\rho$ observado} \\
+\midrule
+Triage       & 1 & 0,88 & 0,958 \\
+Consultorios & 4 & 0,84 & 0,939 \\
+\bottomrule
+\end{tabular}
+\caption{Utilización analítica y observada en las ejecuciones piloto.}
+\label{tab:piloto}
+\end{table}
+
+\subsection{Hallazgo principal}
+
+Las ejecuciones piloto revelaron que el sistema no alcanza régimen
+estacionario dentro del horizonte considerado. Al cierre de la corrida se
+contabilizaron \textbf{55 pacientes en espera de consultorio} frente a
+\textbf{5 en espera de triage}, sobre un total aproximado de 72 pacientes
+arribados.
+
+Dos conclusiones se desprenden de esta observación:
+
+\begin{enumerate}
+  \item \textbf{La restricción dominante son los consultorios médicos}, no el
+  puesto de triage. La cola se acumula aguas abajo de la clasificación.
+  \item \textbf{La magnitud de la acumulación excede lo esperable} para una
+  utilización de 0,84. Un sistema M/M/4 con esa carga presenta una longitud
+  media de cola del orden de tres a cinco pacientes, no de cincuenta y cinco.
+\end{enumerate}
+
+\begin{pendiente}
+El segundo punto indica que el modelo todavía contiene un desajuste no
+resuelto. La hipótesis principal, ya señalada en la sección~1.4, es que la
+exclusión de traumatología, radiografías y medicación concentra en cuatro
+consultorios una demanda que el sistema real reparte entre más sectores. Esta
+sección debe completarse una vez resuelto el punto, incorporando los valores
+definitivos de la tabla~\ref{tab:piloto}.
+\end{pendiente}
+
+\subsection{Sesgo de truncamiento}
+
+Las ejecuciones piloto pusieron de manifiesto un problema metodológico
+relevante. Las métricas de espera se registraban en el momento del egreso del
+paciente, de modo que los pacientes que permanecían en cola al finalizar la
+corrida no quedaban contabilizados.
+
+En un sistema congestionado, los pacientes que alcanzan a egresar son
+precisamente aquellos que esperaron menos, lo que introduce un sesgo
+sistemático hacia valores bajos. El sesgo es además de magnitud distinta
+entre escenarios, lo que invalida la comparación: cuanto más congestionado el
+escenario, mayor la proporción de pacientes truncados y menor el promedio
+observado.
+
+La corrección aplicada consiste en registrar los tiempos de espera en el
+instante en que comienza la atención y no en el egreso, de modo que todo
+paciente que llegó a ser atendido quede contabilizado con independencia de si
+completó su recorrido dentro del horizonte. Adicionalmente se registra el
+número de observaciones de cada estadística como control de sanidad.
+

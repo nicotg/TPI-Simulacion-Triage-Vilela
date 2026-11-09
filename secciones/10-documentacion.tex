@@ -1,0 +1,85 @@
+\section{Documentación, conclusiones y recomendaciones}
+
+\subsection{Conclusiones}
+
+\begin{pendiente}
+Completar con las conclusiones derivadas de los resultados obtenidos. Deben
+responder explícitamente a la pregunta de decisión formulada en la
+sección~1.2 y vincularse con los tres desenlaces previstos.
+\end{pendiente}
+
+\subsection{Recomendaciones}
+
+\begin{pendiente}
+Formular las recomendaciones dirigidas al servicio, distinguiendo entre
+aquellas que el modelo respalda con evidencia estadística y aquellas que
+constituyen sugerencias de prudencia.
+\end{pendiente}
+
+\subsection{Limitaciones del estudio}
+
+\begin{itemize}
+  \item \textbf{Origen de los datos.} Con excepción de la tasa de arribos,
+  consultada con una profesional del servicio, los valores numéricos son
+  estimaciones del grupo y no provienen de registros del hospital. Los
+  tiempos de servicio, las probabilidades de internación y las tasas de error
+  de clasificación constituyen supuestos.
+  \item \textbf{Horizonte de simulación.} La licencia educativa limita las
+  corridas con Pedestrian Library a cinco horas de tiempo simulado, lo que
+  obligó a introducir el factor de escala descripto en la
+  sección~\ref{sec:escala}.
+  \item \textbf{Velocidad de desplazamiento.} El escalado temporal exige
+  multiplicar la velocidad de los peatones por el mismo factor, lo que
+  distorsiona levemente la dinámica de los cuellos de botella físicos. Dado
+  que los desplazamientos representan segundos frente a esperas de decenas de
+  minutos, el efecto sobre las métricas se considera despreciable.
+  \item \textbf{Alcance.} La exclusión de traumatología, radiografías y
+  medicación concentra en los consultorios generales una demanda que el
+  sistema real reparte.
+  \item \textbf{Ausencia de abandonos.} El modelo no representa a los
+  pacientes que se retiran sin ser atendidos.
+  \item \textbf{Régimen estacionario.} Con utilizaciones cercanas a la unidad
+  y un horizonte acotado, el sistema puede no alcanzar régimen estacionario,
+  de modo que los promedios dependen de la duración de la corrida.
+\end{itemize}
+
+\subsection{Trabajo futuro}
+
+\begin{itemize}
+  \item Incorporar un segundo escenario alternativo consistente en la
+  derivación de pacientes verdes a centros de atención primaria.
+  \item Hacer depender la probabilidad de error de clasificación de la carga
+  de trabajo del puesto de triage, de modo que el escenario alternativo
+  incida también sobre la calidad de la clasificación y no sólo sobre los
+  tiempos.
+  \item Sustituir la tasa de arribos constante por una tasa variable por
+  franja horaria.
+  \item Incorporar el abandono de pacientes en espera.
+  \item Validar los tiempos de servicio y las probabilidades de internación
+  contra registros del hospital.
+\end{itemize}
+
+\subsection{Datos que permitirían refinar el modelo}
+
+En caso de obtenerse acceso a registros del servicio, los datos de mayor
+valor para el estudio serían los siguientes, ordenados por impacto:
+
+\begin{enumerate}
+  \item Marcas de tiempo de arribo de cada paciente, sobre varias semanas, que
+  permitirían verificar el supuesto de tasa constante y estimar la variación
+  horaria.
+  \item Duración registrada del triage y de la consulta médica, discriminada
+  por color.
+  \item Proporción de pacientes derivados a traumatología, radiografías y
+  medicación, que determinaría el caudal efectivo hacia los consultorios
+  generales.
+  \item Destino final por color, que permitiría cerrar la discusión sobre la
+  probabilidad de internación del código naranja.
+  \item Proporción de pacientes que se retiran sin ser atendidos.
+\end{enumerate}
+
+Debe señalarse que ninguno de estos datos requiere identificación de
+pacientes: marcas de tiempo, color, consultorio y destino son suficientes, lo
+que facilita su obtención desde el punto de vista del resguardo de la
+información personal.
+

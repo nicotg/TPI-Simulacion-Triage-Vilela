@@ -1,0 +1,26 @@
+# --- Archivos intermedios que genera LaTeX ---
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+
+# --- El PDF se genera, no se versiona ---
+# Es binario: cambia entero en cada compilación y git no sabe fusionarlo.
+# Lo produce el workflow de GitHub en cada push (pestaña Actions).
+informe.pdf
+
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db

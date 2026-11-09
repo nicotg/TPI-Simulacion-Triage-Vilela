@@ -1,0 +1,180 @@
+\section{Formulación del problema y planificación del estudio}
+
+\subsection{Descripción del sistema bajo estudio}
+
+El sistema analizado comprende el flujo de pacientes pediátricos desde su
+ingreso a la guardia hasta la finalización de la atención médica primaria.
+
+Los pacientes pueden ingresar de manera peatonal por la entrada principal o
+mediante ambulancia. En el primer caso atraviesan el proceso de admisión en
+secretaría y luego son evaluados en triage. Los pacientes críticos que
+ingresan en ambulancia son derivados directamente al Shock Room, sin pasar
+por los procesos administrativos.
+
+Durante el triage, una enfermera clasifica a los pacientes según cuatro
+niveles de prioridad. Posteriormente, los pacientes esperan atención médica
+de acuerdo con esa prioridad y con la disponibilidad de los consultorios. El
+modelo considera cuatro consultorios médicos y el Shock Room.
+
+\subsection{Formulación del problema}
+
+La problemática principal se encuentra asociada a la posibilidad de que la
+clasificación realizada durante el triage no coincida con la gravedad real
+del paciente.
+
+Si bien el proceso se basa en criterios clínicos establecidos, en la práctica
+intervienen factores humanos relacionados con la experiencia, el criterio y
+las condiciones de trabajo del profesional responsable de la evaluación. Esto
+puede originar errores de clasificación que modifican artificialmente la
+prioridad con la que un paciente ingresa al sistema de atención.
+
+Se distinguen dos tipos de error:
+
+\begin{itemize}
+  \item \textbf{Sobre-triage:} un paciente cuya condición real presenta
+  gravedad menor recibe una clasificación de mayor prioridad. Como
+  consecuencia, accede anticipadamente a recursos que deberían estar
+  disponibles para pacientes con urgencia real mayor.
+  \item \textbf{Sub-triage:} un paciente cuya condición real presenta
+  gravedad mayor recibe una clasificación de menor prioridad. En este caso
+  permanece en la sala de espera más tiempo del adecuado antes de acceder a
+  la atención médica.
+\end{itemize}
+
+Ambos fenómenos alteran el funcionamiento general de la guardia. El
+sobre-triage incrementa innecesariamente la utilización de los recursos
+destinados a pacientes prioritarios; el sub-triage produce demoras
+particularmente relevantes en pacientes que necesitan atención rápida.
+
+El problema de decisión que guía el estudio puede expresarse de la siguiente
+manera:
+
+\begin{quote}
+\textit{¿En qué medida los errores de clasificación producidos durante el
+triage afectan los tiempos de espera y permanencia de los pacientes en la
+guardia, especialmente aquellos que presentan una urgencia real, y qué efecto
+tendría sobre el desempeño general del sistema una modificación en la
+capacidad del puesto de clasificación?}
+\end{quote}
+
+La simulación permite estudiar este problema sin intervenir sobre el
+funcionamiento real de la guardia y observar el comportamiento del sistema
+bajo distintas condiciones de demanda y clasificación.
+
+\subsection{Objetivos del estudio}
+
+\subsubsection*{Objetivo general}
+
+Desarrollar un modelo de simulación de la guardia pediátrica del Hospital
+Vilela mediante AnyLogic que permita analizar el impacto de los errores de
+clasificación del triage sobre los tiempos de espera, la permanencia de los
+pacientes y la utilización de los recursos de atención.
+
+\subsubsection*{Objetivos específicos}
+
+\begin{itemize}
+  \item Representar el flujo principal de pacientes desde su ingreso hasta la
+  finalización de la atención médica primaria.
+  \item Incorporar la variabilidad existente en los arribos y en los tiempos
+  de atención.
+  \item Analizar los tiempos de espera de los pacientes según su nivel de
+  urgencia.
+  \item Evaluar las demoras experimentadas por pacientes cuya condición real
+  requiere atención prioritaria.
+  \item Analizar la congestión generada en la sala de espera y la utilización
+  de los principales recursos del sistema.
+  \item Comparar el funcionamiento actual con un escenario alternativo
+  orientado a mejorar el desempeño.
+  \item Determinar, mediante corridas múltiples y análisis estadístico, si las
+  diferencias observadas entre escenarios resultan significativas.
+\end{itemize}
+
+\subsection{Alcance del modelo}
+
+El modelo comienza con el arribo del paciente a la guardia --- por el ingreso
+peatonal o por ambulancia --- y finaliza cuando, luego de recibir la atención
+médica primaria, se determina uno de dos destinos finales: alta a domicilio
+o internación.
+
+La internación se considera únicamente como destino final dentro del modelo.
+No se representa la permanencia posterior en las salas de internación ni los
+procesos que ocurren dentro de ellas.
+
+Tampoco se modelan de manera independiente las derivaciones internas hacia
+traumatología, radiografías o medicación e inyecciones. Si bien estos
+sectores forman parte de la guardia real, se excluyen para mantener un nivel
+de abstracción adecuado al problema principal estudiado.
+
+El flujo principal considerado es:
+
+\begin{center}
+Ingreso $\rightarrow$ Admisión $\rightarrow$ Triage $\rightarrow$ Espera según
+prioridad $\rightarrow$ Atención médica $\rightarrow$ Alta / Internación
+\end{center}
+
+Para los pacientes críticos que ingresan mediante ambulancia se contempla un
+flujo diferenciado que evita los procesos administrativos y de triage y
+permite el acceso directo al Shock Room.
+
+\begin{pendiente}
+La exclusión de traumatología, radiografías y medicación retira capacidad de
+atención del modelo pero no retira pacientes: la totalidad de los arribos se
+dirige a los cuatro consultorios generales. Las ejecuciones piloto
+(sección~\ref{sec:piloto}) muestran que esta decisión es la principal
+candidata a explicar la saturación observada. El grupo debe resolver entre
+dos alternativas: (a) declarar que la tasa de arribos representa únicamente
+a los pacientes destinados a consultorio general, o (b) incorporar una
+derivación explícita hacia esos sectores. Este informe documenta el modelo
+tal como está implementado hoy, es decir, sin derivación.
+\end{pendiente}
+
+\subsection{Interacciones y disciplina de las colas}
+
+Los pacientes que ingresan por la entrada principal son atendidos inicialmente
+en secretaría mediante una fila común con disciplina FIFO. Posteriormente
+pasan al proceso de triage, cuya cola previa también es FIFO.
+
+Luego del triage la disciplina cambia. La selección de pacientes para los
+consultorios se realiza de acuerdo con la prioridad clínica asignada:
+
+\begin{center}
+Rojo $\rightarrow$ Naranja $\rightarrow$ Amarillo $\rightarrow$ Verde
+\end{center}
+
+Por este motivo, un paciente que llega después puede ser atendido antes que
+otro que se encuentra esperando, si posee un nivel de prioridad superior.
+
+Corresponde señalar una característica relevante del sistema: \textbf{la cola
+previa al triage es una cola ciega}. Antes de la clasificación nadie conoce la
+gravedad del paciente, de modo que todo el tiempo de espera anterior al
+triage transcurre necesariamente sin priorización alguna.
+
+\subsection{Supuestos iniciales}
+
+\begin{itemize}
+  \item El análisis se concentra en un período de alta demanda de la guardia,
+  correspondiente a un día pico invernal.
+  \item Los arribos de pacientes son estocásticos y siguen un proceso de
+  Poisson.
+  \item Los tiempos asociados a los distintos servicios son variables
+  aleatorias con distribución triangular.
+  \item Los pacientes se clasifican en cuatro niveles de prioridad. La
+  clasificación asignada durante el triage puede diferir de la gravedad real
+  del paciente, por tratarse de una evaluación con componente subjetivo.
+  \item Los pacientes ingresados mediante ambulancia con condición crítica
+  acceden directamente a la atención de emergencia.
+  \item Secretaría funciona mediante una cola FIFO; la atención médica
+  posterior al triage utiliza una cola con prioridad según el código asignado.
+  \item Los únicos destinos finales son la internación y el alta a domicilio.
+  \item No se representan como procesos independientes las derivaciones a
+  traumatología, radiografías o medicación.
+  \item La probabilidad de error de clasificación es independiente de la carga
+  de trabajo de la enfermera.
+\end{itemize}
+
+El último supuesto merece una aclaración. Al mantener constante la tasa de
+error, el escenario alternativo modifica únicamente los tiempos de espera y
+no la calidad de la clasificación. Una versión posterior del modelo podría
+hacer depender la probabilidad de error de la longitud de la cola de triage,
+lo que permitiría capturar un segundo mecanismo de mejora.
+

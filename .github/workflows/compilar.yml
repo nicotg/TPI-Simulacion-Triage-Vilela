@@ -1,0 +1,30 @@
+name: Compilar informe
+
+# Compila el informe en cada push y deja el PDF descargable.
+# Así nadie del grupo necesita instalar LaTeX en su computadora.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Traer el repositorio
+        uses: actions/checkout@v4
+
+      - name: Compilar informe.tex
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: informe.tex
+
+      - name: Publicar el PDF como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe
+          path: informe.pdf
+          retention-days: 30

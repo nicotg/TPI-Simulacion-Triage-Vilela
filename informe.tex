@@ -1,0 +1,173 @@
+% =====================================================================
+%  Trabajo Práctico Integrador — Simulación
+%  Guardia de emergencias pediátricas — Hospital de Niños Víctor J. Vilela
+%
+%  Compilar con:  pdflatex informe.tex   (dos veces, para el índice)
+%  Requiere:      plano_guardia_vilela.png en la misma carpeta
+% =====================================================================
+
+\documentclass{article}
+
+% --- Template "Style and Template for Preprints (arXiv, bio-arXiv)" ---
+% Requiere arxiv.sty en la misma carpeta. arxiv.sty ya carga geometry,
+% fancyhdr y fija la tipografía, por lo que NO debe cargarse geometry aquí.
+\usepackage{arxiv}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% Carga el español sólo si la distribución de LaTeX lo tiene instalado.
+% En Overleaf y en TeX Live completo entra por la primera rama.
+\IfFileExists{spanish.ldf}{\usepackage[spanish,es-noquoting,es-tabla]{babel}}{}
+\usepackage{graphicx}
+\usepackage{nicefrac}
+\usepackage{microtype}
+
+% arxiv.sty rotula el resumen como "Abstract"; se redefine en castellano
+\renewenvironment{abstract}
+  {\centerline{\large \bfseries \scshape Resumen}\begin{quote}}
+  {\end{quote}}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+
+% --- Estilo para fragmentos de código Java de AnyLogic ---
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!60!black},
+  commentstyle=\color{gray},
+  stringstyle=\color{green!40!black},
+  breaklines=true,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{black!30},
+  language=Java,
+  showstringspaces=false,
+  columns=fullflexible
+}
+
+% --- Marcador visible para decisiones que el grupo todavía debe tomar ---
+% Para eliminarlos todos de una vez, reemplazar el cuerpo por \ignorespaces
+\newenvironment{pendiente}
+  {\par\medskip\noindent\begingroup\color{red!65!black}%
+   \textbf{[PENDIENTE — decisión del grupo]}\ \itshape}
+  {\endgroup\par\medskip}
+
+% =====================================================================
+
+\title{Análisis del impacto de los errores de clasificación en el triage
+  de una guardia pediátrica: un estudio de simulación de eventos discretos}
+
+% Encabezado de página y leyenda bajo el título
+\renewcommand{\headeright}{Trabajo Práctico Integrador}
+\renewcommand{\undertitle}{Trabajo Práctico Integrador --- Simulación}
+\renewcommand{\shorttitle}{Simulación de la guardia del Hospital Vilela}
+
+\author{
+  Nombre y Apellido \\
+  Legajo 00000 \\
+  \texttt{correo@ejemplo.com} \\
+  \And
+  Nombre y Apellido \\
+  Legajo 00000 \\
+  \texttt{correo@ejemplo.com} \\
+  \AND
+  Nombre y Apellido \\
+  Legajo 00000 \\
+  \texttt{correo@ejemplo.com} \\
+  \And
+  Nombre y Apellido \\
+  Legajo 00000 \\
+  \texttt{correo@ejemplo.com} \\
+}
+
+\date{\today}
+
+% =====================================================================
+
+\begin{document}
+
+% Nombres en castellano, válidos con o sin el paquete de idioma instalado
+\renewcommand{\contentsname}{Índice}
+\renewcommand{\refname}{Bibliografía}
+\renewcommand{\tablename}{Tabla}
+\renewcommand{\figurename}{Figura}
+\renewcommand{\lstlistingname}{Código}
+% arxiv.sty fija "Keywords" en inglés; se traduce aquí
+\makeatletter
+\def\keywordname{{\bfseries \emph{Palabras clave}}}
+\makeatother
+
+\maketitle
+
+\begin{abstract}
+El presente trabajo analiza el funcionamiento de la guardia pediátrica del
+Hospital de Niños Víctor J. Vilela de la ciudad de Rosario mediante un modelo
+de simulación de eventos discretos desarrollado en AnyLogic. La institución
+atiende aproximadamente 97.000 consultas anuales por guardia, lo que implica
+una elevada demanda de recursos y la necesidad de establecer prioridades de
+atención. El modelo representa el recorrido completo del paciente, desde su
+ingreso --- peatonal o en ambulancia --- hasta su egreso por alta o
+internación, incorporando de manera explícita la posibilidad de que la
+clasificación asignada durante el triage difiera de la gravedad real del
+paciente. Sobre ese modelo se compara la configuración actual del servicio
+con un escenario alternativo que incorpora un segundo puesto de
+clasificación, evaluando la significancia estadística de las diferencias
+mediante un test de medias sobre corridas múltiples.
+\end{abstract}
+
+\keywords{Simulación de eventos discretos \and Teoría de colas \and Triage
+\and Guardia pediátrica \and AnyLogic}
+
+\begin{pendiente}
+Completar los nombres, legajos y correos de los integrantes en el preámbulo
+del archivo \texttt{informe.tex}.
+\end{pendiente}
+
+\newpage
+\tableofcontents
+\newpage
+
+% =====================================================================
+\input{secciones/00-introduccion}
+\input{secciones/01-formulacion}
+\input{secciones/02-datos}
+\input{secciones/03-validacion-conceptual}
+\input{secciones/04-construccion-verificacion}
+\input{secciones/05-ejecuciones-piloto}
+\input{secciones/06-validacion-programado}
+\input{secciones/07-diseno-experimentos}
+\input{secciones/08-corridas-produccion}
+\input{secciones/09-analisis-salida}
+\input{secciones/10-documentacion}
+
+\begin{thebibliography}{9}
+
+\bibitem{ross}
+Ross, S. M.
+\textit{Simulation}.
+Academic Press.
+
+\bibitem{lawkelton}
+Law, A. M. y Kelton, W. D.
+\textit{Simulation Modeling and Analysis}.
+McGraw-Hill.
+
+\bibitem{anylogic}
+AnyLogic.
+\textit{AnyLogic Help: Pedestrian Library}.
+\url{https://anylogic.help/library-reference-guides/pedestrian-library/index.html}
+
+\end{thebibliography}
+
+\begin{pendiente}
+Verificar edición y año de cada referencia contra los ejemplares utilizados
+en la cátedra, y agregar la bibliografía específica sobre triage pediátrico
+que respalde la clasificación en cuatro niveles. El enunciado no admite
+Wikipedia como referencia.
+\end{pendiente}
+
+\end{document}
