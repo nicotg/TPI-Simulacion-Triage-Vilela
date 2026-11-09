@@ -8,14 +8,13 @@ en AnyLogic.
 
 | Archivo | Qué es |
 | --- | --- |
-| `informe.tex` | Documento principal. Sólo preámbulo, portada y los `\input` de cada sección. |
-| `secciones/` | Una sección por archivo. **Acá se escribe.** |
+| `informe.tex` | El informe completo. **Acá se escribe.** |
 | `arxiv.sty` | Estilo del template de preprints. No se toca. |
 | `plano_guardia_vilela.png` | Plano de la guardia, figura 1. |
 | `.github/workflows/` | Compila el PDF en cada push. |
 
-El informe sigue los diez pasos de un estudio de simulación. Cada paso es un
-archivo en `secciones/`, numerado en el orden en que aparece.
+El informe sigue los diez pasos de un estudio de simulación. Cada paso es una
+sección numerada del documento, en orden.
 
 ## Cómo conseguir el PDF
 
@@ -33,57 +32,41 @@ pdflatex informe.tex
 pdflatex informe.tex   # la segunda pasada arma el índice
 ```
 
-**En Overleaf.** Proyecto nuevo en blanco y subir todos los archivos
-respetando la carpeta `secciones/`.
+**En Overleaf.** Proyecto nuevo en blanco y subir los cuatro archivos.
 
-## Cómo editar sin pisarse
+## Cómo editar
 
-Somos varios escribiendo el mismo documento. Tres reglas que evitan casi
-todos los conflictos:
+Todo el informe está en `informe.tex`. Dos cosas a tener en cuenta:
 
-**1. Cada uno en su archivo.** Antes de empezar, avisen qué sección van a
-tocar. Dos personas en el mismo archivo es la única forma de generar
-conflictos serios.
+**Avisá qué sección vas a tocar.** Git fusiona solo los cambios que no se
+superponen, así que dos personas trabajando en secciones distintas no se
+pisan. El problema aparece cuando dos tocan el mismo párrafo.
 
-**2. Una oración por línea.** Suena raro, pero es la práctica estándar para
-escribir LaTeX entre varios:
+**Hacé `git pull` antes de empezar y `git push` apenas termines.** Cuanto más
+corto el ciclo, menos chance de superposición.
 
-```latex
-El modelo representa el recorrido completo del paciente.
-Los pacientes ingresan de manera peatonal o en ambulancia.
-```
-
-y no así:
-
-```latex
-El modelo representa el recorrido completo del paciente. Los pacientes
-ingresan de manera peatonal o en ambulancia.
-```
-
-El PDF sale idéntico, porque LaTeX ignora los saltos de línea simples. La
-diferencia es que si alguien agrega tres palabras al principio de un párrafo
-escrito a lo ancho, se recorta todo y git marca el párrafo entero como
-modificado. Con una oración por línea, un cambio toca una línea.
-
-El texto que ya está viene cortado por ancho, no por oración. No hace falta
-convertirlo de una: aplicá la regla a lo que escribas de nuevo.
-
-**3. No versionar el PDF.** Está en el `.gitignore`. Es binario y genera
+**No versiones el PDF.** Está en el `.gitignore`: es binario y genera
 conflictos que no se pueden resolver.
 
 ## Flujo de trabajo
 
 ```bash
 git pull                          # siempre antes de empezar
-git checkout -b seccion-5         # una rama por tarea
-# ... editar ...
-git add secciones/05-ejecuciones-piloto.tex
+# ... editar informe.tex ...
+git add informe.tex
 git commit -m "Completa resultados de las ejecuciones piloto"
-git push -u origin seccion-5
+git push
 ```
 
-Después, merge a `main` desde GitHub. Para cuatro personas con fecha de
-entrega no hace falta formalizar pull requests: alcanza con ramas y avisarse.
+Para cambios grandes conviene una rama:
+
+```bash
+git checkout -b analisis-resultados
+# ... editar ...
+git push -u origin analisis-resultados
+```
+
+y después merge a `main` desde GitHub.
 
 ## Lo que falta
 
@@ -92,13 +75,12 @@ decisión que el grupo todavía debe tomar o cada resultado que falta cargar.
 Para encontrarlos todos:
 
 ```bash
-grep -rn "begin{pendiente}" secciones/
+grep -n "begin{pendiente}" informe.tex
 ```
 
 Los principales:
 
-- Nombres, legajos y correos de los integrantes (en el preámbulo de
-  `informe.tex`).
+- Nombres, legajos y correos de los integrantes (en el preámbulo).
 - Tasa de arribos: constante o variable por franja horaria.
 - Proporción de pacientes de código rojo: 1 % o 3 %.
 - Probabilidad de internación del código naranja: 60 % o 85 %.
