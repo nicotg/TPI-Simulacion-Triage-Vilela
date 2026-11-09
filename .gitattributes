@@ -1,0 +1,8 @@
+# Normaliza los finales de línea al guardar en el repositorio.
+# Sin esto, Windows guarda CRLF y macOS/Linux guardan LF, y git marca
+# el archivo entero como modificado aunque se haya tocado una palabra.
+* text=auto eol=lf
+
+# Binarios: git no debe intentar convertirlos ni fusionarlos.
+*.png binary
+*.pdf binary
