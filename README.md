@@ -81,7 +81,6 @@ grep -n "begin{pendiente}" informe.tex
 Los principales:
 
 - Nombres, legajos y correos de los integrantes (en el preámbulo).
-- Tasa de arribos: constante o variable por franja horaria.
 - Proporción de pacientes de código rojo: 1 % o 3 %.
 - Probabilidad de internación del código naranja: 60 % o 85 %.
 - Derivación a traumatología, radiografías y medicación.

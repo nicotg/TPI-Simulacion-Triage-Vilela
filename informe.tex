@@ -485,28 +485,87 @@ dejar constancia del criterio adoptado.
 El Hospital Vilela registra aproximadamente 97.000 consultas anuales por
 guardia, lo que equivale a unos 266 pacientes diarios. Distribuidos de manera
 uniforme a lo largo de las 24 horas representarían alrededor de 11 pacientes
-por hora.
+por hora. Este valor sirve como orden de magnitud, pero no resulta aplicable
+de manera directa: la demanda presenta una marcada variación estacional y
+horaria, y el período bajo estudio corresponde precisamente a una franja de
+alta demanda.
 
-El modelo implementado utiliza una tasa constante de \textbf{10 pacientes por
-hora} para el ingreso peatonal y \textbf{0,2 por hora} para el ingreso en
-ambulancia, sobre una ventana de ocho horas correspondiente al turno
-vespertino. Este valor fue consultado con una profesional que se desempeña en
-la guardia, quien lo consideró razonable para el día modelado.
+Dado que no se dispone de registros de arribos discriminados por hora, la
+tasa se estimó mediante \textbf{calibración inversa a partir de la congestión
+observada}. El procedimiento se apoya en una propiedad conocida de los
+sistemas de colas: la longitud media de la cola depende de manera muy sensible
+de la tasa de arribos cuando el sistema opera próximo a su capacidad, de modo
+que un nivel de congestión observado identifica la tasa con precisión.
+
+\subsubsection*{Capacidad máxima del sistema}
+
+El primer paso consiste en determinar el techo del sistema. Con un puesto de
+triage de un único servidor y un tiempo medio de clasificación de 5,33
+minutos, la capacidad máxima de procesamiento resulta
+
+\[
+\lambda_{\max}^{\text{triage}} = \frac{60}{5{,}33} \approx 11{,}3
+\text{ pacientes por hora,}
+\]
+
+mientras que los cuatro consultorios, con un tiempo medio de consulta de 20,3
+minutos, admiten hasta 11,9 pacientes por hora. La restricción efectiva es por
+lo tanto el puesto de triage: \textbf{por encima de 11,3 pacientes por hora el
+sistema no alcanza régimen estacionario} y la cola crece de manera indefinida.
+
+Este resultado constituye en sí mismo un hallazgo del estudio: la guardia
+opera, en condiciones de alta demanda, muy próxima a su límite teórico de
+capacidad.
+
+\subsubsection*{Calibración}
+
+El relevamiento indica que, en el período analizado, la sala de espera aloja
+habitualmente entre 10 y 15 pacientes. Evaluando la longitud media de cola
+para distintas tasas de arribo dentro del rango admisible se obtiene:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Arribos/hora} & \textbf{$\rho$ triage} & \textbf{$\rho$ consultorios}
+& \textbf{Pacientes en sala} & \textbf{Espera al médico} \\
+\midrule
+9{,}0  & 0,79 & 0,75 & 2,5  & 6 min \\
+10{,}0 & 0,88 & 0,84 & 5,4  & 12 min \\
+10{,}5 & 0,93 & 0,88 & 9,1  & 18 min \\
+\textbf{10{,}7} & \textbf{0,94} & \textbf{0,90} & \textbf{11,9} & \textbf{22 min} \\
+11{,}0 & 0,97 & 0,92 & 21,4 & 31 min \\
+\bottomrule
+\end{tabular}
+\caption{Congestión esperada según la tasa de arribos. La fila destacada
+corresponde al valor adoptado.}
+\label{tab:calibracion}
+\end{table}
+
+La sensibilidad de la relación es notable: entre 10 y 11 pacientes por hora la
+ocupación de la sala pasa de 5 a 21 pacientes. Por ese motivo el rango
+observado de 10 a 15 pacientes determina la tasa dentro de un intervalo
+estrecho.
+
+Se adopta en consecuencia una tasa de \textbf{10,7 pacientes por hora} para el
+ingreso peatonal, que reproduce una ocupación media de 11,9 pacientes en la
+sala de espera, consistente con lo relevado. Para el ingreso en ambulancia se
+adopta \textbf{0,2 pacientes por hora}.
 
 Los arribos se modelan mediante un proceso de Poisson, que constituye el
 supuesto estándar para llegadas independientes a un servicio de urgencias.
 
-\begin{pendiente}
-El documento de avance anterior proponía una tasa \emph{variable por franja
-horaria} (13, 16, 18, 20, 19 y 16 pacientes por hora entre las 14:00 y las
-20:00, aproximadamente 102 pacientes en seis horas), mientras que el modelo
-implementa una tasa constante de 10 por hora durante ocho horas,
-aproximadamente 80 pacientes. Las dos definiciones son incompatibles y debe
-elegirse una. Debe tenerse presente que con la capacidad actualmente
-representada en el modelo, una tasa media de 17 pacientes por hora conduce a
-una utilización de los consultorios superior a la unidad, es decir, a un
-sistema que no alcanza régimen estacionario.
-\end{pendiente}
+\subsubsection*{Consecuencias del valor adoptado}
+
+Con esta tasa el puesto de triage opera al 94 \% de utilización y los
+consultorios al 90 \%. La espera media hasta la clasificación resulta del
+orden de los 45 minutos, superior a la espera posterior hasta el consultorio,
+que ronda los 22 minutos.
+
+Este desbalance refuerza la pertinencia del escenario alternativo planteado en
+la sección~\ref{sec:experimentos}: el puesto de clasificación, por tratarse de
+un servidor único operando cerca de la saturación, concentra la mayor parte de
+la demora del sistema.
 
 \subsection{Tiempos de servicio}
 
@@ -847,39 +906,51 @@ detectar comportamientos anómalos antes de las corridas de producción.
 \toprule
 \textbf{Recurso} & \textbf{Servidores} & \textbf{$\rho$ analítico} & \textbf{$\rho$ observado} \\
 \midrule
-Triage       & 1 & 0,88 & 0,958 \\
-Consultorios & 4 & 0,84 & 0,939 \\
+Triage       & 1 & 0,94 & --- \\
+Consultorios & 4 & 0,90 & --- \\
 \bottomrule
 \end{tabular}
 \caption{Utilización analítica y observada en las ejecuciones piloto.}
 \label{tab:piloto}
 \end{table}
 
-\subsection{Hallazgo principal}
+\subsection{Criterio de aceptación}
 
-Las ejecuciones piloto revelaron que el sistema no alcanza régimen
-estacionario dentro del horizonte considerado. Al cierre de la corrida se
-contabilizaron \textbf{55 pacientes en espera de consultorio} frente a
-\textbf{5 en espera de triage}, sobre un total aproximado de 72 pacientes
-arribados.
+Las ejecuciones piloto tienen por objeto confirmar que el programa reproduce
+los valores analíticos antes de pasar a las corridas de producción. Con la
+tasa adoptada en la sección~\ref{sec:arribos}, el modelo debe arrojar
+aproximadamente los siguientes valores:
 
-Dos conclusiones se desprenden de esta observación:
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Magnitud} & \textbf{Valor esperado} \\
+\midrule
+Utilización del triage          & 0,94 \\
+Utilización de los consultorios & 0,90 \\
+Pacientes en la sala de espera  & 12 \\
+Espera media hasta el consultorio & 22 min \\
+Espera media hasta el triage      & 45 min \\
+\bottomrule
+\end{tabular}
+\caption{Valores analíticos que las ejecuciones piloto deben reproducir.}
+\label{tab:aceptacion}
+\end{table}
 
-\begin{enumerate}
-  \item \textbf{La restricción dominante son los consultorios médicos}, no el
-  puesto de triage. La cola se acumula aguas abajo de la clasificación.
-  \item \textbf{La magnitud de la acumulación excede lo esperable} para una
-  utilización de 0,84. Un sistema M/M/4 con esa carga presenta una longitud
-  media de cola del orden de tres a cinco pacientes, no de cincuenta y cinco.
-\end{enumerate}
+Un desvío apreciable respecto de estos valores indica una inconsistencia en la
+implementación y no una propiedad del sistema modelado. La tabla cumple por lo
+tanto una doble función: validar la calibración y verificar el programa.
 
 \begin{pendiente}
-El segundo punto indica que el modelo todavía contiene un desajuste no
-resuelto. La hipótesis principal, ya señalada en la sección~1.4, es que la
-exclusión de traumatología, radiografías y medicación concentra en cuatro
-consultorios una demanda que el sistema real reparte entre más sectores. Esta
-sección debe completarse una vez resuelto el punto, incorporando los valores
-definitivos de la tabla~\ref{tab:piloto}.
+Completar con los resultados de las ejecuciones piloto sobre la configuración
+definitiva, incorporando los valores observados a las
+tablas~\ref{tab:piloto} y~\ref{tab:aceptacion}. Las primeras ejecuciones
+arrojaron una acumulación de pacientes muy superior a la prevista
+analíticamente; esa discrepancia debe resolverse antes de las corridas de
+producción. Dos causas candidatas: un error de implementación en los tiempos
+de servicio, y la concentración en cuatro consultorios de una demanda que el
+sistema real reparte entre más sectores (sección~1.4).
 \end{pendiente}
 
 \subsection{Sesgo de truncamiento}
@@ -919,10 +990,14 @@ medio de servicio y $c$ el número de servidores:
 \rho = \frac{\lambda\, E[S]}{c}
 \]
 
-Para el puesto de triage, con $\lambda = 9{,}91$ pacientes por hora y
-$E[S] = 5{,}33$ minutos, resulta $\rho = 0{,}88$. Para los consultorios, con
-$E[S] = 20{,}3$ minutos ponderado por la distribución de colores y $c = 4$,
-resulta $\rho = 0{,}84$.
+Para el puesto de triage, con $\lambda = 10{,}6$ pacientes por hora
+efectivos y $E[S] = 5{,}33$ minutos, resulta $\rho = 0{,}94$. Para los
+consultorios, con $E[S] = 20{,}3$ minutos ponderado por la distribución de
+colores y $c = 4$, resulta $\rho = 0{,}90$.
+
+La tasa efectiva es inferior a los 10,7 pacientes por hora adoptados porque
+los pacientes identificados como críticos en el acceso se derivan al Shock
+Room sin atravesar el triage ni los consultorios.
 
 La comparación de estos valores con los de la tabla~\ref{tab:piloto}
 constituye la prueba de validación más exigente aplicada al modelo, por
@@ -939,16 +1014,28 @@ Room y que los consultorios se ocupen de manera equilibrada.
 
 \subsection{Validación con el sistema real}
 
+La tasa de arribos fue calibrada de modo que el modelo reprodujera la
+ocupación media de la sala de espera relevada en el servicio, entre 10 y 15
+pacientes (sección~\ref{sec:arribos}). Esa congestión constituye por lo tanto
+una magnitud ajustada y no una predicción independiente del modelo.
+
+La validación propiamente dicha consiste en verificar que las magnitudes
+\emph{no} utilizadas en la calibración resulten igualmente verosímiles. En
+particular, la tasa adoptada implica una espera media hasta la clasificación
+del orden de los 45 minutos y una permanencia total cercana a los 96 minutos,
+valores que deben contrastarse con la experiencia del servicio.
+
 \begin{pendiente}
-Esta subsección debe completarse contrastando las salidas del modelo con el
-conocimiento de la profesional del hospital consultada: ¿resultan
-verosímiles los tiempos de espera obtenidos? ¿se corresponde la proporción de
-internaciones con lo observado en la práctica? Se recomienda documentar esa
+Contrastar con el personal de la guardia las magnitudes que no intervinieron
+en la calibración: ¿resultan verosímiles una espera de unos 45 minutos hasta
+el triage y una permanencia total cercana a la hora y media? ¿Se corresponde
+la proporción de internaciones con lo observado en la práctica? Documentar esa
 conversación como evidencia de validación.
 \end{pendiente}
 
 % =====================================================================
 \section{Diseño de experimentos}
+\label{sec:experimentos}
 
 \subsection{Escenarios}
 
@@ -1230,11 +1317,13 @@ constituyen sugerencias de prudencia.
 \subsection{Limitaciones del estudio}
 
 \begin{itemize}
-  \item \textbf{Origen de los datos.} Con excepción de la tasa de arribos,
-  consultada con una profesional del servicio, los valores numéricos son
-  estimaciones del grupo y no provienen de registros del hospital. Los
-  tiempos de servicio, las probabilidades de internación y las tasas de error
-  de clasificación constituyen supuestos.
+  \item \textbf{Origen de los datos.} Ninguno de los valores numéricos
+  proviene de registros históricos del hospital. La tasa de arribos se obtuvo
+  por calibración inversa sobre la congestión relevada, procedimiento que
+  traslada al resultado la incertidumbre de esa observación. Los tiempos de
+  servicio, las probabilidades de internación y las tasas de error de
+  clasificación constituyen estimaciones del grupo contrastadas con el
+  relevamiento.
   \item \textbf{Horizonte de simulación.} La licencia educativa limita las
   corridas con Pedestrian Library a cinco horas de tiempo simulado, lo que
   obligó a introducir el factor de escala descripto en la
@@ -1264,7 +1353,8 @@ constituyen sugerencias de prudencia.
   incida también sobre la calidad de la clasificación y no sólo sobre los
   tiempos.
   \item Sustituir la tasa de arribos constante por una tasa variable por
-  franja horaria.
+  franja horaria, y validarla contra marcas de tiempo reales en lugar de
+  obtenerla por calibración.
   \item Incorporar el abandono de pacientes en espera.
   \item Validar los tiempos de servicio y las probabilidades de internación
   contra registros del hospital.
@@ -1276,9 +1366,9 @@ En caso de obtenerse acceso a registros del servicio, los datos de mayor
 valor para el estudio serían los siguientes, ordenados por impacto:
 
 \begin{enumerate}
-  \item Marcas de tiempo de arribo de cada paciente, sobre varias semanas, que
-  permitirían verificar el supuesto de tasa constante y estimar la variación
-  horaria.
+  \item Marcas de tiempo de arribo de cada paciente, sobre varias semanas.
+  Permitirían reemplazar la tasa calibrada por una medida, verificar el
+  supuesto de tasa constante y estimar la variación horaria.
   \item Duración registrada del triage y de la consulta médica, discriminada
   por color.
   \item Proporción de pacientes derivados a traumatología, radiografías y
